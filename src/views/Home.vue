@@ -9,10 +9,38 @@
     </van-swipe>
     <!-- 用于读取图片颜色的canvas -->
     <canvas ref="getPicColor" style="display:none;"></canvas>
+    <h3 class="main_title">导航一</h3>
+    <ul class="nav_list">
+      <li v-for="i in 8" :key="i">
+        <p>
+          <van-icon name="like" size="20rem" color="#ff6700" />
+        </p>
+        <p>按钮{{i}}</p>
+      </li>
+    </ul>
+    <h3 class="main_title">导航二</h3>
+    <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+      <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+        <van-cell v-for="item in list" :key="item">
+          <div class="goods_info_item">
+            <div><img src="../assets/img/banner1.jpg"></div>
+            <div>
+              <p>商品名称</p>
+              <p>商品介绍</p>
+              <p>价格</p>
+            </div>
+          </div>
+        </van-cell>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
 <script>
+import Vue from "vue";
+import { List } from "vant";
+
+Vue.use(List);
 export default {
   name: "Home",
   data() {
@@ -34,7 +62,11 @@ export default {
           src: require("../assets/img/banner4.jpg"),
           bc: ""
         }
-      ]
+      ],
+      list: [],
+      loading: false,
+      finished: false,
+      refreshing: false
     };
   },
   methods: {
@@ -89,6 +121,32 @@ export default {
         const style = "linear-gradient(to right," + color1 + "," + color2 + ")";
         $this.banners[index].bc = style;
       };
+    },
+    onLoad() {
+      setTimeout(() => {
+        if (this.refreshing) {
+          this.list = [];
+          this.refreshing = false;
+        }
+
+        for (let i = 0; i < 10; i++) {
+          this.list.push(this.list.length + 1);
+        }
+        this.loading = false;
+
+        if (this.list.length >= 40) {
+          this.finished = true;
+        }
+      }, 1000);
+    },
+    onRefresh() {
+      // 清空列表数据
+      this.finished = false;
+
+      // 重新加载数据
+      // 将 loading 设置为 true，表示处于加载状态
+      this.loading = true;
+      this.onLoad();
     }
   },
   mounted() {
@@ -135,6 +193,65 @@ export default {
       width: 100%;
       height: 150px;
       object-fit: fill;
+    }
+  }
+}
+.main_title {
+  height: 22px;
+  line-height: 22px;
+  margin-top: 10px;
+  font-size: 14rem;
+  border-left: 3px solid #ff6700;
+  margin-left: 10px;
+  padding-left: 10px;
+}
+.nav_list {
+  padding: 10px 10px 0;
+  display: flex;
+  justify-content: left;
+  flex-wrap: wrap;
+  li {
+    width: 25%;
+    margin-bottom: 10px;
+    text-align: center;
+    cursor: pointer;
+    * {
+      cursor: pointer;
+    }
+  }
+}
+.goods_info_item{
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  *{
+    cursor: pointer;
+  }
+  > div:first-child{
+    width: 25%;
+    img{
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+    }
+  }
+  > div:last-child{
+    width: 75%;
+    padding-left: 10px;
+    p{
+      margin-bottom: 5px;
+      &:first-child{
+        color:#333;
+        font-size:14rem;
+      }
+      &:nth-child(2){
+        color:#666;
+        font-size:12rem;
+      }
+      &:last-child{
+        color:#ff6700;
+        font-size:14rem;
+      }
     }
   }
 }
