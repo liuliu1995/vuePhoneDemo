@@ -1,37 +1,59 @@
 <template>
   <div class="home">
-    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
-      <van-swipe-item v-for="item in banners" :key="item.index" :style="'background:'+item.bc">
-        <div>
-          <img :src="item.src" />
-        </div>
-      </van-swipe-item>
-    </van-swipe>
-    <!-- 用于读取图片颜色的canvas -->
-    <canvas ref="getPicColor" style="display:none;"></canvas>
-    <h3 class="main_title">导航一</h3>
-    <ul class="nav_list">
-      <li v-for="i in 8" :key="i">
-        <p>
-          <van-icon name="like" size="20rem" color="#ff6700" />
-        </p>
-        <p>按钮{{i}}</p>
-      </li>
-    </ul>
-    <h3 class="main_title">导航二</h3>
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-      <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-        <van-cell v-for="item in list" :key="item">
-          <div class="goods_info_item">
-            <div><img src="../assets/img/banner1.jpg"></div>
-            <div>
-              <p>商品名称</p>
-              <p>商品介绍</p>
-              <p>价格</p>
-            </div>
+      <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+        <van-swipe-item v-for="item in banners" :key="item.index" :style="'background:'+item.bc">
+          <div>
+            <img :src="item.src" />
           </div>
-        </van-cell>
+        </van-swipe-item>
+      </van-swipe>
+      <!-- 用于读取图片颜色的canvas -->
+      <canvas ref="getPicColor" style="display:none;"></canvas>
+      <h3 class="main_title">导航一</h3>
+      <ul class="nav_list">
+        <li v-for="i in 8" :key="i">
+          <p>
+            <van-icon name="like" size="20rem" color="#ff6700" />
+          </p>
+          <p>按钮{{i}}</p>
+        </li>
+      </ul>
+      <h3 class="main_title">导航二</h3>
+      <van-list
+        v-model="loading"
+        :finished="finished"
+        finished-text="没有更多了"
+        @load="onLoad"
+        id="goods_list"
+      >
+        <waterfall
+          id="goods_list"
+          :col="2"
+          :width="itemWidth"
+          :gutterWidth="gutterWidth"
+          :data="list"
+        >
+          <template>
+            <van-cell v-for="item in list" :key="item" :id="'goodItem'+item">
+              <div class="goods_info_item">
+                <div>
+                  <img src="../assets/img/banner1.jpg" :style="item%2 == 0?'height:120px;':item%3==0?'height:150px;':''"/>
+                </div>
+                <div>
+                  <p>商品名称</p>
+                  <p>商品介绍</p>
+                  <p>价格</p>
+                </div>
+              </div>
+            </van-cell>
+          </template>
+        </waterfall>
       </van-list>
+      <!-- 返回顶部 -->
+      <div class="go_top_btn" v-show="topShow" @click="goTop">
+        <van-icon name="arrow-up" size="26rem" color="#ff6700" />
+      </div>
     </van-pull-refresh>
   </div>
 </template>
@@ -66,7 +88,9 @@ export default {
       list: [],
       loading: false,
       finished: false,
-      refreshing: false
+      refreshing: false,
+      scroll: 0,
+      topShow: false
     };
   },
   methods: {
@@ -133,20 +157,39 @@ export default {
           this.list.push(this.list.length + 1);
         }
         this.loading = false;
-
+        //todo:页码多于一页时有问题
         if (this.list.length >= 40) {
           this.finished = true;
         }
+        let readyState = document.readyState;
       }, 1000);
     },
     onRefresh() {
       // 清空列表数据
       this.finished = false;
-
+      this.list = [];
       // 重新加载数据
       // 将 loading 设置为 true，表示处于加载状态
       this.loading = true;
       this.onLoad();
+    },
+    windowScroll() {
+      this.scroll =
+        document.documentElement.scrollTop || document.body.scrollTop;
+      this.scroll > 300 ? (this.topShow = true) : (this.topShow = false);
+    },
+    goTop() {
+      let timer = setInterval(function() {
+        let osTop =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        let ispeed = Math.floor(-osTop / 5);
+        document.documentElement.scrollTop = document.body.scrollTop =
+          osTop + ispeed;
+        this.topShow = false;
+        if (osTop === 0) {
+          clearInterval(timer);
+        }
+      }, 30);
     }
   },
   mounted() {
@@ -155,6 +198,16 @@ export default {
     const canvas = this.$refs.getPicColor;
     for (let i = 0; i < $this.banners.length; i++) {
       $this.getImgColor(canvas, i, $this);
+    }
+    //窗口滚动
+    window.addEventListener("scroll", this.windowScroll);
+  },
+  computed: {
+    itemWidth() {
+      return 0.48*document.documentElement.clientWidth;
+    },
+    gutterWidth() {
+      return 10;
     }
   }
 };
@@ -220,39 +273,49 @@ export default {
     }
   }
 }
-.goods_info_item{
-  display: flex;
-  justify-content: space-between;
+#goods_list {
+  .van-cell {
+    &:not(:last-child)::after {
+      display: none; /**去除边线 */
+    }
+  }
+}
+.goods_info_item {
   cursor: pointer;
-  *{
+  * {
     cursor: pointer;
   }
-  > div:first-child{
-    width: 25%;
-    img{
-      width: 100%;
-      height: 100%;
-      object-fit: fill;
+  div {
+    p:first-child {
+      font-size: 14rem;
+      color: #333;
+    }
+    p:nth-child(2) {
+      font-size: 12rem;
+      color: #666;
+    }
+    p:last-child {
+      font-size: 14rem;
+      color: #ff6700;
     }
   }
-  > div:last-child{
-    width: 75%;
-    padding-left: 10px;
-    p{
-      margin-bottom: 5px;
-      &:first-child{
-        color:#333;
-        font-size:14rem;
-      }
-      &:nth-child(2){
-        color:#666;
-        font-size:12rem;
-      }
-      &:last-child{
-        color:#ff6700;
-        font-size:14rem;
-      }
-    }
+}
+.go_top_btn {
+  width:50px;
+  height: 50px;
+  line-height: 50px;
+  padding-top: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  border: 1px solid #dcdcdc;
+  box-shadow: 3px 3px 3px #888;
+  text-align: center;
+  position: fixed;
+  right: 20px;
+  bottom: 50px;
+  cursor: pointer;
+  * {
+    cursor: pointer;
   }
 }
 </style>
