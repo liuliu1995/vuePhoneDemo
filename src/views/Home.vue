@@ -38,7 +38,10 @@
             <van-cell v-for="item in list" :key="item" :id="'goodItem'+item">
               <div class="goods_info_item">
                 <div>
-                  <img src="../assets/img/banner1.jpg" :style="item%2 == 0?'height:120px;':item%3==0?'height:150px;':''"/>
+                  <img
+                    src="../assets/img/banner1.jpg"
+                    :style="item%2 == 0?'height:120px;':item%3==0?'height:150px;':''"
+                  />
                 </div>
                 <div>
                   <p>商品名称</p>
@@ -204,7 +207,7 @@ export default {
   },
   computed: {
     itemWidth() {
-      return 0.48*document.documentElement.clientWidth;
+      return 0.5 * (document.documentElement.clientWidth - 30);
     },
     gutterWidth() {
       return 10;
@@ -220,12 +223,13 @@ export default {
   position: relative;
   width: 100%;
   height: 170px;
+  background-color: #f7f7f7;
   &::after {
     display: block;
     content: "";
     width: 100%;
     height: 100px;
-    background-color: #fff;
+    background-color: #f7f7f7;
     position: absolute;
     left: 0;
     top: 120px;
@@ -274,9 +278,15 @@ export default {
   }
 }
 #goods_list {
+  padding: 5px 5px;
   .van-cell {
+    margin-bottom: 10px;
     &:not(:last-child)::after {
       display: none; /**去除边线 */
+    }
+    img {
+      height: 80px;
+      object-fit:fill;
     }
   }
 }
@@ -285,6 +295,7 @@ export default {
   * {
     cursor: pointer;
   }
+  border-radius: 5px;
   div {
     p:first-child {
       font-size: 14rem;
@@ -301,7 +312,7 @@ export default {
   }
 }
 .go_top_btn {
-  width:50px;
+  width: 50px;
   height: 50px;
   line-height: 50px;
   padding-top: 6px;
