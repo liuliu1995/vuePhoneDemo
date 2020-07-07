@@ -19,7 +19,6 @@
           <p>按钮{{i}}</p>
         </li>
       </ul>
-      <div id="qrcode" style="width:100%;min-height:300px;"></div>
       <h3 class="main_title">导航二</h3>
       <van-list
         v-model="loading"
@@ -197,59 +196,6 @@ export default {
         }
       }, 30);
     },
-    //生成带参数的二维码
-    async getQrCode() {
-      // 1.获取token                 https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
-      // 2.生成ticket                https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=TOKEN
-      // 3.使用ticket换取二维码       https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=TICKET
-      const APPID = "wx69310fabdebab3cb";
-      const APPSECRET = "fe6a3b3d6c2f81e159595c80e49f7d06";
-      async function getToken(appid, secret) {
-        return new Promise((resolve, reject) => {
-          axios
-            .get(
-              "api/token?grant_type=client_credential&appid=" +
-                appid +
-                "&secret=" +
-                secret
-            )
-            .then(response => {
-              resolve(response.data.access_token);
-            });
-        });
-      }
-      async function getTicket() {
-        return new Promise((resolve, reject) => {
-          axios
-            .post("api/qrcode/create?access_token=" + token, {
-              expire_seconds: 3600, //二维码有效期
-              action_name: "QR_STR_SCENE", //二维码类型，临时 QR_LIMIT_STR_SCENE表示永久
-              action_info: { scene: { scene_str: "test" } } //二维码详细信息 scene_id/scene_str
-            })
-            .then(response => {
-              resolve(response.data);
-            });
-        });
-      }
-      let token = await getToken(APPID, APPSECRET);
-      let ticketData = await getTicket(token);
-      console.log("ticket", ticketData);
-      const that = this;
-      this.$nextTick(() => {
-        if (this.qrcode) {
-          this.qrcode.makeCode(ticketData.url);
-          return;
-        }
-        this.qrcode = new QRCode("qrcode", {
-          width: 248,
-          height: 248, // 高度
-          text: ticketData.url // 二维码内容
-          // render: 'canvas' ,   // 设置渲染方式（有两种方式 table和canvas，默认是canvas）
-          // background: '#f0f',   // 背景色
-          // foreground: '#ff0'    // 前景色
-        });
-      });
-    }
   },
   mounted() {
     //下面是vue中读取banners图片颜色
@@ -260,7 +206,6 @@ export default {
     }
     //窗口滚动
     window.addEventListener("scroll", this.windowScroll);
-    this.getQrCode();
   },
   computed: {
     itemWidth() {
