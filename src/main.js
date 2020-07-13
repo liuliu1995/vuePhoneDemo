@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './plugins/vant.js'
+import './components'; // 全局组件注册
 
 /**公共样式 */
 import "../src/assets/css/scss/common.min.css"

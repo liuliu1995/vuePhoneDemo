@@ -10,16 +10,58 @@
       </van-swipe>
       <!-- 用于读取图片颜色的canvas -->
       <canvas ref="getPicColor" style="display:none;"></canvas>
-      <h3 class="main_title">导航一</h3>
+      <!-- <h3 class="main_title">品牌</h3> -->
       <ul class="nav_list">
-        <li v-for="i in 8" :key="i">
+        <li>
           <p>
-            <van-icon name="like" size="20rem" color="#ff6700" />
+            <img src="../assets/img/HuaShuoLogo.jpg" />
           </p>
-          <p>按钮{{i}}</p>
+          <p>华硕</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/HuaWeiLogo.jpg" />
+          </p>
+          <p>华为</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/WaiXingRenLogo.jpg" />
+          </p>
+          <p>外星人</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/LianXiangLogo.jpg" />
+          </p>
+          <p>联想</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/PingGuoLogo.jpg" />
+          </p>
+          <p>苹果</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/JiXieGeMingLogo.png" />
+          </p>
+          <p>机械革命</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/WeiXingLogo.jpg" />
+          </p>
+          <p>微星</p>
+        </li>
+        <li>
+          <p>
+            <img src="../assets/img/XiaoMiLogo.jpg" />
+          </p>
+          <p>小米</p>
         </li>
       </ul>
-      <h3 class="main_title">导航二</h3>
+      <!-- <h3 class="main_title">列表</h3> -->
       <van-list
         v-model="loading"
         :finished="finished"
@@ -35,18 +77,17 @@
           :data="list"
         >
           <template>
-            <van-cell v-for="item in list" :key="item" :id="'goodItem'+item">
-              <div class="goods_info_item">
+            <van-cell v-for="(item,index) in list" :key="item" :id="'goodItem'+item">
+              <div class="goods_info_item" @click="goToDetail(index)">
                 <div>
                   <img
-                    src="../assets/img/banner1.jpg"
-                    :style="item%2 == 0?'height:120px;':item%3==0?'height:150px;':''"
+                    :src="(index + 5)%5 == 0?require('../assets/img/goods1.jpg'):(index + 5)%5 == 1?require('../assets/img/goods2.jpg'):(index + 5)%5 ==2?require('../assets/img/goods3.jpg'):(index + 5)%5 == 3?require('../assets/img/goods4.jpg'):require('../assets/img/goods5.jpg')"
                   />
                 </div>
                 <div>
-                  <p>商品名称</p>
-                  <p>商品介绍</p>
-                  <p>价格</p>
+                  <p>XXX笔记本电脑</p>
+                  <p>笔记本电脑介绍介绍介绍介绍介绍介绍介绍介绍介绍介绍</p>
+                  <p>¥ 9999</p>
                 </div>
               </div>
             </van-cell>
@@ -65,7 +106,6 @@
 import Vue from "vue";
 import { List } from "vant";
 import axios from "axios";
-import QRCode from "qrcodejs2";
 
 Vue.use(List);
 export default {
@@ -83,10 +123,6 @@ export default {
         },
         {
           src: require("../assets/img/banner3.jpg"),
-          bc: ""
-        },
-        {
-          src: require("../assets/img/banner4.jpg"),
           bc: ""
         }
       ],
@@ -196,6 +232,14 @@ export default {
         }
       }, 30);
     },
+    goToDetail(index) {
+      this.$router.push({
+        path: "/goodsDetail",
+        query: {
+          goodsId: index
+        }
+      });
+    }
   },
   mounted() {
     //下面是vue中读取banners图片颜色
@@ -274,8 +318,14 @@ export default {
     margin-bottom: 10px;
     text-align: center;
     cursor: pointer;
+    color: #888;
     * {
       cursor: pointer;
+    }
+    p {
+      width: 80%;
+      text-align: center;
+      margin-left: 10%;
     }
   }
 }
@@ -287,7 +337,8 @@ export default {
       display: none; /**去除边线 */
     }
     img {
-      height: 80px;
+      width: 100%;
+      height: auto;
       object-fit: fill;
     }
   }
