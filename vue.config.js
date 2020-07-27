@@ -1,5 +1,5 @@
 module.exports = {
-    outputDir: 'test',  //build输出目录  默认不需要配置
+    outputDir: 'vueThree',  //build输出目录  默认不需要配置
     publicPath: './',
     devServer: {
         open: true, //是否自动弹出浏览器页面
